@@ -36,8 +36,8 @@
 #######################################################
 
 #BURN features:
-4% fee auto add to the liquidity pool to locked forever when selling
-4% fee auto distribute to all holders
+5% fee auto add to the liquidity pool to locked forever when selling
+2% fee auto distribute to all holders
 
 */
 
@@ -68,7 +68,7 @@ contract BURN is Context, IERC20, Ownable {
     address[] private _excluded;
    
     uint256 private constant MAX = ~uint256(0);
-    uint256 private _tTotal = 100000 * 10**6 * 10**9;
+    uint256 private _tTotal = 1000000000 * 10**6 * 10**9;
     uint256 private _rTotal = (MAX - (MAX % _tTotal));
     uint256 private _tFeeTotal;
 
@@ -76,10 +76,10 @@ contract BURN is Context, IERC20, Ownable {
     string private _symbol = "BURN";
     uint8 private _decimals = 9;
     
-    uint256 public _taxFee = 4;
+    uint256 public _taxFee = 2;
     uint256 private _previousTaxFee = _taxFee;
     
-    uint256 public _liquidityFee = 4;
+    uint256 public _liquidityFee = 5;
     uint256 private _previousLiquidityFee = _liquidityFee;
 
     IUniswapV2Router02 public immutable uniswapV2Router;
@@ -88,8 +88,8 @@ contract BURN is Context, IERC20, Ownable {
     bool inSwapAndLiquify;
     bool public swapAndLiquifyEnabled = true;
     
-    uint256 public _maxTxAmount = 1000 * 10**6 * 10**9;
-    uint256 private numTokensSellToAddToLiquidity = 1000 * 10**6 * 10**9;
+    uint256 public _maxTxAmount = 5000000 * 10**6 * 10**9;
+    uint256 private numTokensSellToAddToLiquidity = 5000000 * 10**6 * 10**9;
     
     event MinTokensBeforeSwapUpdated(uint256 minTokensBeforeSwap);
     event SwapAndLiquifyEnabledUpdated(bool enabled);
@@ -109,8 +109,11 @@ contract BURN is Context, IERC20, Ownable {
         _rOwned[_msgSender()] = _rTotal;
         
         //TESTNET
-        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0xD99D1c33F9fC3444f8101754aBC46c52416550D1);
+        //IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0xD99D1c33F9fC3444f8101754aBC46c52416550D1);
         //MAINNET
+        //V2 Pancake Router
+        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x10ED43C718714eb63d5aA57B78B54704E256024E);
+        //V1 Pancake Router
         //IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F);
         // Create a uniswap pair for this new token
         uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
@@ -233,7 +236,8 @@ contract BURN is Context, IERC20, Ownable {
             }
         }
     }
-        function _transferBothExcluded(address sender, address recipient, uint256 tAmount) private {
+    
+    function _transferBothExcluded(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee, uint256 tLiquidity) = _getValues(tAmount);
         _tOwned[sender] = _tOwned[sender].sub(tAmount);
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
